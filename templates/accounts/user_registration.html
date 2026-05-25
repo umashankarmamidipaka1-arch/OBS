@@ -1,185 +1,282 @@
 {% extends 'core/base.html' %}
 
-{% block head_title %}Banking System{% endblock %}
+{% block head_title %}Register | Aditya Banking{% endblock %}
 
 {% block content %}
-{% if registration_form.non_field_errors %}
-    {% for error in registration_form.non_field_errors %}
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2" role="alert">
-        <p class="font-bold">Error!</p>
-        <p class="block sm:inline">{{ error }}</p>
-    </div>
-    {% endfor %}
-{% endif %}
-{% if address_form.non_field_errors %}
-    {% for error in address_form.non_field_errors %}
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2" role="alert">
-        <p class="font-bold">Error!</p>
-        <p class="block sm:inline">{{ error }}</p>
-    </div>
-    {% endfor %}
-{% endif %}
-
-<h1 class="font-mono font-bold text-3xl text-center pb-5 pt-10">Register</h1>
-<hr />
-<div class="w-full mt-10">
-    <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        {% csrf_token %}
-        {% for hidden_field in registration_form.hidden_fields %}
-            {{ hidden_field.errors }}
-            {{ hidden_field }}
-        {% endfor %}
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.first_name.id_for_label }}">
-                    {{ registration_form.first_name.label }}
-                </label>
-                {{ registration_form.first_name }}
-                {% if registration_form.first_name.errors %}
-                    {% for error in registration_form.first_name.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+<div class="max-w-2xl mx-auto mt-6">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+        <div class="text-center space-y-1">
+            <div class="inline-flex space-x-1.5 justify-center items-center mb-2">
+                <span class="font-extrabold text-2xl tracking-wider text-teal-400">ADITYA</span>
+                <span class="font-light text-2xl tracking-widest text-slate-350">BANKING</span>
             </div>
-            <div class="w-full md:w-1/2 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.last_name.id_for_label }}">
-                    {{ registration_form.last_name.label }}
-                </label>
-                {{ registration_form.last_name }}
-                {% if registration_form.last_name.errors %}
-                    {% for error in registration_form.last_name.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.email.id_for_label }}">
-                    {{ registration_form.email.label }}
-                </label>
-                {{ registration_form.email }}
-                {% if registration_form.email.errors %}
-                    {% for error in registration_form.email.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.account_type.id_for_label }}">
-                    {{ registration_form.account_type.label }}
-                </label>
-                {{ registration_form.account_type }}
-                {% if registration_form.account_type.errors %}
-                    {% for error in registration_form.account_type.errors %}
-                    <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.gender.id_for_label }}">
-                    {{ registration_form.gender.label }}
-                </label>
-                {{ registration_form.gender }}
-                {% if registration_form.gender.errors %}
-                    {% for error in registration_form.gender.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.birth_date.id_for_label }}">
-                    {{ registration_form.birth_date.label }}
-                </label>
-                {{ registration_form.birth_date }}
-                {% if registration_form.birth_date.errors %}
-                    {% for error in registration_form.birth_date.errors %}
-                    <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.password1.id_for_label }}">
-                    {{ registration_form.password1.label }}
-                </label>
-                {{ registration_form.password1 }}
-                {% if registration_form.password1.errors %}
-                    {% for error in registration_form.password1.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ registration_form.password2.id_for_label }}">
-                    {{ registration_form.password2.label }}
-                </label>
-                {{ registration_form.password2 }}
-                    {% if registration_form.password2.errors %}
-                    {% for error in registration_form.password2.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
+            <h2 class="text-xl font-bold text-white">Create a Bank Account</h2>
+            <p class="text-slate-400 text-xs">Fill out the information below to register and open an account instantly.</p>
         </div>
 
-        {% for hidden_field in address_form.hidden_fields %} {{ hidden_field.errors }} {{ hidden_field }} {% endfor %}
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ address_form.street_address.id_for_label }}">
-                    {{ address_form.street_address.label }}
-                </label>
-                {{ address_form.street_address }}
-                {% if address_form.street_address.errors %}
-                    {% for error in address_form.street_address.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+        {% if registration_form.non_field_errors %}
+            <div class="bg-red-950/40 border border-red-500/20 rounded-xl p-4 text-xs text-red-200 space-y-1">
+                {% for error in registration_form.non_field_errors %}
+                    <p class="font-semibold">{{ error }}</p>
+                {% endfor %}
             </div>
-            <div class="w-full md:w-1/2 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ address_form.city.id_for_label }}">
-                    {{ address_form.city.label }}
-                </label>
-                {{ address_form.city }}
-                {% if address_form.city.errors %}
-                    {% for error in address_form.city.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+        {% endif %}
+        {% if address_form.non_field_errors %}
+            <div class="bg-red-950/40 border border-red-500/20 rounded-xl p-4 text-xs text-red-200 space-y-1">
+                {% for error in address_form.non_field_errors %}
+                    <p class="font-semibold">{{ error }}</p>
+                {% endfor %}
             </div>
-        </div>
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ address_form.postal_code.id_for_label }}">
-                    {{ address_form.postal_code.label }}
-                </label>
-                {{ address_form.postal_code }}
-                {% if address_form.postal_code.errors %}
-                    {% for error in address_form.postal_code.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            {% for hidden_field in registration_form.hidden_fields %}
+                {{ hidden_field }}
+            {% endfor %}
+            
+            <div class="space-y-4">
+                <h3 class="text-xs uppercase tracking-wider text-teal-400 font-extrabold border-b border-slate-800 pb-2">Personal Credentials</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.first_name.id_for_label }}">
+                            First Name
+                        </label>
+                        {{ registration_form.first_name }}
+                        {% if registration_form.first_name.errors %}
+                            {% for error in registration_form.first_name.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.last_name.id_for_label }}">
+                            Last Name
+                        </label>
+                        {{ registration_form.last_name }}
+                        {% if registration_form.last_name.errors %}
+                            {% for error in registration_form.last_name.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.email.id_for_label }}">
+                            Email Address
+                        </label>
+                        {{ registration_form.email }}
+                        {% if registration_form.email.errors %}
+                            {% for error in registration_form.email.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.account_type.id_for_label }}">
+                            Account Type
+                        </label>
+                        {{ registration_form.account_type }}
+                        {% if registration_form.account_type.errors %}
+                            {% for error in registration_form.account_type.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.gender.id_for_label }}">
+                            Gender Identity
+                        </label>
+                        {{ registration_form.gender }}
+                        {% if registration_form.gender.errors %}
+                            {% for error in registration_form.gender.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.birth_date.id_for_label }}">
+                            Date of Birth
+                        </label>
+                        {{ registration_form.birth_date }}
+                        {% if registration_form.birth_date.errors %}
+                            {% for error in registration_form.birth_date.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.password1.id_for_label }}">
+                            Password
+                        </label>
+                        {{ registration_form.password1 }}
+                        {% if registration_form.password1.errors %}
+                            {% for error in registration_form.password1.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.password2.id_for_label }}">
+                            Verify Password
+                        </label>
+                        {{ registration_form.password2 }}
+                        {% if registration_form.password2.errors %}
+                            {% for error in registration_form.password2.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="w-full md:w-1/2 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="{{ address_form.country.id_for_label }}">
-                    {{ address_form.country.label }}
-                </label>
-                {{ address_form.country }}
-                {% if address_form.country.errors %}
-                    {% for error in address_form.country.errors %}
-                        <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+
+            <!-- RBI KYC & Document Verification Section -->
+            <div class="space-y-4">
+                <h3 class="text-xs uppercase tracking-wider text-teal-400 font-extrabold border-b border-slate-800 pb-2">Identity Verification & RBI KYC</h3>
+                
+                <div class="bg-slate-950/60 border border-slate-850 rounded-xl p-4 text-slate-400 text-[11px] leading-relaxed space-y-1.5">
+                    <span class="text-teal-400 font-bold">💡 Simulated OCR Document Verification:</span>
+                    <p>To pass the automated ID verification scan, please upload a <code class="text-slate-200 font-bold bg-slate-900 px-1 py-0.5 rounded">.txt</code> document containing your exact <strong>First Name</strong>, <strong>Last Name</strong>, <strong>ID Number</strong>, and <strong>DOB</strong> (e.g. <code class="text-slate-200 bg-slate-900 px-1 py-0.5 rounded">1990-05-15</code>). Alternatively, for image uploads, avoid files with 'fail' or 'invalid' in the filename.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.id_proof_type.id_for_label }}">
+                            ID Proof Type
+                        </label>
+                        {{ registration_form.id_proof_type }}
+                        {% if registration_form.id_proof_type.errors %}
+                            {% for error in registration_form.id_proof_type.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.id_proof_no.id_for_label }}">
+                            ID Proof Number
+                        </label>
+                        {{ registration_form.id_proof_no }}
+                        {% if registration_form.id_proof_no.errors %}
+                            {% for error in registration_form.id_proof_no.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.pan_no.id_for_label }}">
+                            PAN Card Number
+                        </label>
+                        {{ registration_form.pan_no }}
+                        {% if registration_form.pan_no.errors %}
+                            {% for error in registration_form.pan_no.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.id_proof_document.id_for_label }}">
+                            Upload ID Proof Document (OVD)
+                        </label>
+                        {{ registration_form.id_proof_document }}
+                        {% if registration_form.id_proof_document.errors %}
+                            {% for error in registration_form.id_proof_document.errors %}
+                                <p class="text-red-455 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ registration_form.passport_photo.id_for_label }}">
+                            Passport Size Photo
+                        </label>
+                        {{ registration_form.passport_photo }}
+                        {% if registration_form.passport_photo.errors %}
+                            {% for error in registration_form.passport_photo.errors %}
+                                <p class="text-red-455 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="flex items-center justify-between">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                Register
-            </button>
-        </div>
-    </form>
+
+            {% for hidden_field in address_form.hidden_fields %}
+                {{ hidden_field }}
+            {% endfor %}
+
+            <div class="space-y-4">
+                <h3 class="text-xs uppercase tracking-wider text-teal-400 font-extrabold border-b border-slate-800 pb-2">Home Address details</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ address_form.street_address.id_for_label }}">
+                            Street Address
+                        </label>
+                        {{ address_form.street_address }}
+                        {% if address_form.street_address.errors %}
+                            {% for error in address_form.street_address.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ address_form.city.id_for_label }}">
+                            City
+                        </label>
+                        {{ address_form.city }}
+                        {% if address_form.city.errors %}
+                            {% for error in address_form.city.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ address_form.postal_code.id_for_label }}">
+                            Postal Code
+                        </label>
+                        {{ address_form.postal_code }}
+                        {% if address_form.postal_code.errors %}
+                            {% for error in address_form.postal_code.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400" for="{{ address_form.country.id_for_label }}">
+                            Country
+                        </label>
+                        {{ address_form.country }}
+                        {% if address_form.country.errors %}
+                            {% for error in address_form.country.errors %}
+                                <p class="text-red-450 text-[10px] font-semibold mt-1">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 flex flex-col space-y-3">
+                <button type="submit" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-teal-500/10">
+                    Open Bank Account
+                </button>
+                <div class="text-center text-xs text-slate-400 pt-2">
+                    Already have an account? <a href="{% url 'accounts:user_login' %}" class="text-teal-400 hover:underline">Log in instead</a>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

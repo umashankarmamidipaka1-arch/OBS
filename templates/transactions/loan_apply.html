@@ -1,13 +1,13 @@
 {% extends 'core/base.html' %}
 
-{% block head_title %}{{ title }} | Aditya Banking{% endblock %}
+{% block head_title %}Apply for Loan | Aditya Banking{% endblock %}
 
 {% block content %}
 <div class="max-w-lg mx-auto mt-10">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
         <div class="text-center space-y-1">
-            <h2 class="text-2xl font-extrabold text-white">{{ title }}</h2>
-            <p class="text-slate-400 text-sm">Please input the amount for this transaction. Limits apply based on account type.</p>
+            <h2 class="text-2xl font-extrabold text-white">Apply for a Loan</h2>
+            <p class="text-slate-400 text-sm">Submit your loan application. Note that Branch Managers review all loans before disbursing funds.</p>
         </div>
 
         {% if form.non_field_errors %}
@@ -20,12 +20,22 @@
 
         <form method="post" class="space-y-4">
             {% csrf_token %}
-
+            
             <div class="space-y-2">
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Amount ($)</label>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Loan Principal Amount ($)</label>
                 {{ form.amount }}
                 {% if form.amount.errors %}
                     {% for error in form.amount.errors %}
+                        <p class="text-red-400 text-[11px] font-semibold mt-1">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Duration (Months)</label>
+                {{ form.term_months }}
+                {% if form.term_months.errors %}
+                    {% for error in form.term_months.errors %}
                         <p class="text-red-400 text-[11px] font-semibold mt-1">{{ error }}</p>
                     {% endfor %}
                 {% endif %}
@@ -36,7 +46,7 @@
                     Back to Dashboard
                 </a>
                 <button type="submit" class="w-1/2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-teal-500/10">
-                    Confirm Action
+                    Apply for Loan
                 </button>
             </div>
         </form>

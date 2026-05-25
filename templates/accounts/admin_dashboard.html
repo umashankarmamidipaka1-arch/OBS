@@ -1,0 +1,104 @@
+{% extends 'core/base.html' %}
+
+{% block head_title %}Admin Console | Aditya Banking{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-white">System Security & Role Console</h1>
+        <p class="text-slate-400 text-sm mt-1">Configure global user permissions, assign personnel roles, and review the live transactional ledger.</p>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Role Manager Module -->
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-white">Global User Directory & Role Assignment</h3>
+            <p class="text-slate-400 text-xs">Instantly promote customers to Employee, Branch Manager, or Admin status to delegate system privileges.</p>
+
+            <div class="overflow-x-auto pt-2">
+                <table class="w-full text-xs text-left">
+                    <thead class="text-[10px] uppercase text-slate-500 border-b border-slate-850">
+                        <tr>
+                            <th class="py-2.5">User</th>
+                            <th class="py-2.5">Current Role</th>
+                            <th class="py-2.5">Access Override</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-850 text-slate-300">
+                        {% if users %}
+                            {% for u in users %}
+                                <tr class="hover:bg-slate-850/30 transition">
+                                    <td class="py-3">
+                                        <div class="font-bold text-white">{{ u.get_full_name|default:"No Name" }}</div>
+                                        <div class="text-[10px] text-slate-500">{{ u.email }}</div>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="px-2 py-0.5 text-[9px] bg-slate-950 border border-slate-800 text-teal-400 rounded font-bold uppercase tracking-wider">
+                                            {{ u.get_role_display }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3">
+                                        <form method="post" action="{% url 'transactions:admin_update_role' u.id %}" class="flex items-center space-x-2">
+                                            {% csrf_token %}
+                                            <select name="role" class="bg-slate-950 border border-slate-850 rounded px-2.5 py-1 text-[11px] text-slate-300 outline-none focus:border-teal-500">
+                                                {% for val, name in role_choices %}
+                                                    <option value="{{ val }}" {% if u.role == val %}selected{% endif %}>{{ name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="bg-teal-500 hover:bg-teal-400 text-slate-950 px-2.5 py-1 rounded text-[10px] font-bold transition">
+                                                Assign
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-6 text-slate-500">No users found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Global Bank Ledger Audit -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-white">System Ledger Audit Log</h3>
+            <p class="text-slate-400 text-xs">Real-time ledger audit log across the banking ecosystem.</p>
+
+            <div class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                {% if global_transactions %}
+                    {% for tx in global_transactions %}
+                        <div class="bg-slate-950 border border-slate-850 rounded-xl p-3 text-xs space-y-1.5 hover:border-slate-800 transition">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-teal-400 font-bold">Acct: {{ tx.account.account_no }}</span>
+                                <span class="font-mono font-bold {% if tx.transaction_type == 1 or tx.transaction_type == 3 or tx.transaction_type == 5 %}text-teal-400{% else %}text-red-400{% endif %}">
+                                    {% if tx.transaction_type == 1 or tx.transaction_type == 3 or tx.transaction_type == 5 %}+{% else %}-{% endif %} ${{ tx.amount }}
+                                </span>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500">
+                                <span>Type: 
+                                    {% if tx.transaction_type == 1 %}Deposit
+                                    {% elif tx.transaction_type == 2 %}Withdrawal
+                                    {% elif tx.transaction_type == 3 %}Interest
+                                    {% elif tx.transaction_type == 4 %}P2P Sent
+                                    {% elif tx.transaction_type == 5 %}P2P Recv
+                                    {% endif %}
+                                </span>
+                                <span>{{ tx.timestamp|date:"Y-m-d H:i:s" }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="flex flex-col items-center justify-center py-8 text-center text-slate-500 text-xs">
+                        No transactions registered in system database.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

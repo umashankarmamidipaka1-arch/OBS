@@ -1,0 +1,116 @@
+{% extends 'core/base.html' %}
+
+{% block head_title %}Employee Portal | Aditya Banking{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">Employee Operation Center</h1>
+            <p class="text-slate-400 text-sm mt-1">Search user bank files, verify identity protocols, and perform counter transactions.</p>
+        </div>
+        <div>
+            <a href="{% url 'transactions:otc_transaction' %}" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl transition shadow-lg shadow-teal-500/20 text-sm flex items-center space-x-1.5">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.879M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM12 6.502v.01M12 9.002v.01M12 11.502v.01M12 14.002v.01M12 16.502v.01" />
+                </svg>
+                <span>OTC Counter Transaction</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Account Search Module -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-white">Query Bank Accounts</h3>
+            <form method="get" class="flex space-x-2">
+                <div class="flex-grow relative bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex items-center px-3.5">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search by Account No, Email, or Name..." class="w-full bg-transparent outline-none py-2.5 text-sm text-slate-200 placeholder-slate-500">
+                </div>
+                <button type="submit" class="bg-slate-850 hover:bg-slate-800 text-teal-400 border border-slate-850 hover:border-slate-700 px-5 rounded-xl transition text-sm font-bold">
+                    Query
+                </button>
+            </form>
+
+            <div class="overflow-x-auto pt-2">
+                <table class="w-full text-xs text-left">
+                    <thead class="text-[10px] uppercase text-slate-500 border-b border-slate-850">
+                        <tr>
+                            <th class="py-2.5">Account No</th>
+                            <th class="py-2.5">Holder</th>
+                            <th class="py-2.5">Balance</th>
+                            <th class="py-2.5">KYC</th>
+                            <th class="py-2.5 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-850 text-slate-300">
+                        {% if accounts %}
+                            {% for acc in accounts %}
+                                <tr class="hover:bg-slate-850/30 transition">
+                                    <td class="py-3 font-mono font-bold text-white">{{ acc.account_no }}</td>
+                                    <td class="py-3">
+                                        <div class="font-medium text-slate-200">{{ acc.user.get_full_name|default:acc.user.email }}</div>
+                                        <div class="text-[10px] text-slate-500">{{ acc.user.email }}</div>
+                                    </td>
+                                    <td class="py-3 font-mono text-slate-200">${{ acc.balance }}</td>
+                                    <td class="py-3">
+                                        {% if acc.kyc_verified %}
+                                            <span class="text-teal-400 font-semibold">Verified</span>
+                                        {% else %}
+                                            <span class="text-yellow-500 font-semibold">Unverified</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <a href="{% url 'transactions:otc_transaction' %}?account={{ acc.account_no }}" class="text-[10px] bg-slate-800 hover:bg-slate-750 text-teal-400 border border-slate-750 px-2.5 py-1 rounded transition font-semibold">
+                                            OTC Action
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-slate-500">No bank accounts match query.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pending KYC Module -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-white">KYC Verification Inbox</h3>
+            <p class="text-slate-400 text-xs">Verify customer IDs and details. These users cannot apply for loans or exceed limits until verified.</p>
+            
+            <div class="space-y-3 pt-2">
+                {% if pending_kyc %}
+                    {% for acc in pending_kyc %}
+                        <div class="bg-slate-950 border border-slate-850 rounded-xl p-4 flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-sm text-white">Acct: <span class="font-mono text-teal-400">{{ acc.account_no }}</span></div>
+                                <div class="text-xs text-slate-400 mt-0.5">{{ acc.user.get_full_name|default:acc.user.email }}</div>
+                                <div class="text-[10px] text-slate-500 mt-1">Birth Date: {{ acc.birth_date|date:"Y-m-d" }} | Address: {{ acc.user.address.street_address }}, {{ acc.user.address.city }}</div>
+                            </div>
+                            <form method="post" action="{% url 'transactions:verify_kyc' acc.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                                    Approve KYC
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="flex flex-col items-center justify-center py-8 text-center">
+                        <svg class="h-10 w-10 text-slate-800 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                        </svg>
+                        <p class="text-xs text-slate-500">All registrations are fully verified.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

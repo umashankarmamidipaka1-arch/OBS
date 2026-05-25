@@ -1,0 +1,399 @@
+{% extends 'core/base.html' %}
+
+{% block head_title %}Customer Dashboard | Aditya Banking{% endblock %}
+
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">Welcome back, {{ request.user.first_name|default:"Valued Customer" }}</h1>
+            <p class="text-slate-400 text-sm mt-1">Manage your funds, loans, and virtual cards instantly.</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="{% url 'transactions:transfer_money' %}" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl transition shadow-lg shadow-teal-500/20 text-sm flex items-center space-x-1.5">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                </svg>
+                <span>Send Money</span>
+            </a>
+            <a href="{% url 'transactions:deposit_money' %}" class="bg-slate-900 border border-slate-800 hover:bg-slate-850 text-slate-100 font-bold px-4 py-2.5 rounded-xl transition text-sm flex items-center space-x-1.5">
+                <svg class="h-4 w-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Deposit</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- First Grid: Balance & Savings Goals & Spending Chart -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Balance Card -->
+        <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-teal-950 border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden flex flex-col justify-between h-[230px]">
+            <div class="absolute -right-16 -top-16 w-44 h-44 rounded-full bg-teal-500/5 blur-3xl"></div>
+            <div>
+                <span class="text-xs uppercase tracking-widest text-slate-500 font-semibold">Available Balance</span>
+                <h2 class="text-4xl font-black text-white mt-2 font-mono">$ {{ account.balance|default:"0.00" }}</h2>
+                <div class="mt-4 flex space-x-4 text-xs text-slate-400">
+                    <p>Account No: <strong class="text-teal-400 font-mono">{{ account.account_no }}</strong></p>
+                    <p>Type: <strong class="text-slate-200">{{ account.account_type.name }}</strong></p>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-800/80 pt-4 flex justify-between items-center text-xs">
+                <div>
+                    <span class="text-slate-500 block">Daily Limit</span>
+                    <span class="text-slate-300 font-mono">${{ account.account_type.maximum_withdrawal_amount }}</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-slate-500 block">KYC Status</span>
+                    {% if account.kyc_verified %}
+                        <span class="text-teal-400 font-semibold flex items-center justify-end space-x-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                            <span>Verified</span>
+                        </span>
+                    {% else %}
+                        <span class="text-yellow-500 font-semibold flex items-center justify-end space-x-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
+                            <span>Pending Verify</span>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget & Saving Goal tracker -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between h-[230px]">
+            <div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs uppercase tracking-widest text-slate-500 font-semibold">Savings Goal Tracker</span>
+                    <button onclick="document.getElementById('goal-modal').classList.remove('hidden')" class="text-xs text-teal-400 hover:underline">Edit</button>
+                </div>
+                
+                {% if account.saving_goal > 0 %}
+                    <h3 class="text-lg font-bold text-white mt-3">{{ account.saving_goal_title|default:"My Savings Goal" }}</h3>
+                    <p class="text-slate-400 text-xs mt-1">Target: <span class="font-mono text-slate-200">${{ account.saving_goal }}</span></p>
+                    
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                            <span>Progress</span>
+                            <span class="font-mono text-teal-400">{{ goal_percentage }}%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div class="bg-teal-400 h-full rounded-full transition-all duration-500" style="width: {{ goal_percentage }}%"></div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                        <svg class="h-8 w-8 text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <p class="text-xs text-slate-500">No active savings goal configured.</p>
+                        <button onclick="document.getElementById('goal-modal').classList.remove('hidden')" class="mt-2 text-xs bg-slate-800 hover:bg-slate-750 text-teal-400 px-3 py-1.5 rounded-lg border border-slate-750 transition font-semibold">Create Goal</button>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="text-xs text-slate-500 pt-2 border-t border-slate-800/80">
+                Saving goals dynamically match against your balance.
+            </div>
+        </div>
+
+        <!-- Expense Chart -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between h-[230px] overflow-hidden">
+            <span class="text-xs uppercase tracking-widest text-slate-500 font-semibold mb-2 block">Monthly Spending Breakdown</span>
+            <div class="flex-grow flex items-center justify-center relative w-full h-[140px]">
+                <canvas id="spendingChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Grid: Virtual Card Wallet & Applied Loans -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Virtual Debit Cards Wallet -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold text-white">Virtual Debit Cards</h3>
+                    <p class="text-slate-400 text-xs">Instantly generate cards for secure online checkouts.</p>
+                </div>
+                {% if virtual_cards|length < 3 %}
+                    <form method="post" action="{% url 'transactions:generate_card' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-teal-500/10 border border-teal-500/20 hover:bg-teal-500/20 text-teal-400 text-xs px-3 py-2 rounded-xl transition font-semibold">
+                            Generate Card
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+            
+            <div class="space-y-4">
+                {% if virtual_cards %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for card in virtual_cards %}
+                            <!-- Real Debit Card Display -->
+                            <div class="relative rounded-2xl p-5 overflow-hidden shadow-2xl border transition-all duration-300 {% if card.is_frozen %}bg-slate-950 border-slate-800 grayscale opacity-65{% else %}bg-gradient-to-br from-indigo-950 via-slate-900 to-teal-950 border-slate-800/80 hover:shadow-teal-500/5{% endif %} h-[170px] flex flex-col justify-between">
+                                <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-teal-500/5 blur-xl"></div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400">Virtual Debit</span>
+                                    <div class="flex space-x-1">
+                                        <div class="w-3.5 h-3.5 rounded-full bg-teal-400/80"></div>
+                                        <div class="w-3.5 h-3.5 rounded-full bg-indigo-500/80 -ml-2"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-mono text-white tracking-widest">{{ card.card_number|slice:"0:4" }} **** **** {{ card.card_number|slice:"12:16" }}</p>
+                                    <div class="flex justify-between items-center mt-3 text-[10px] text-slate-400">
+                                        <div>
+                                            <span class="block text-[8px] uppercase tracking-wider text-slate-500">Holder</span>
+                                            <span class="font-semibold text-white tracking-wide">{{ card.card_holder }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="block text-[8px] uppercase tracking-wider text-slate-500">Expiry</span>
+                                            <span class="font-mono text-white">{{ card.expiry_date|date:"m/y" }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="block text-[8px] uppercase tracking-wider text-slate-500">CVV</span>
+                                            <span class="font-mono text-white">{{ card.cvv }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2 pt-2 border-t border-slate-850 mt-1">
+                                    <form method="post" action="{% url 'transactions:toggle_card_freeze' card.id %}" class="w-1/2">
+                                        {% csrf_token %}
+                                        <button type="submit" class="w-full text-center text-[10px] bg-slate-800 hover:bg-slate-750 text-slate-300 py-1 rounded-md transition font-semibold">
+                                            {% if card.is_frozen %}Unfreeze{% else %}Freeze{% endif %}
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'transactions:delete_card' card.id %}" class="w-1/2">
+                                        {% csrf_token %}
+                                        <button type="submit" class="w-full text-center text-[10px] bg-red-950/20 hover:bg-red-950/40 text-red-400 py-1 rounded-md transition border border-red-500/10">
+                                            Terminate
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="flex flex-col items-center justify-center py-8 border-2 border-dashed border-slate-800 rounded-2xl text-center">
+                        <svg class="h-10 w-10 text-slate-700 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-5.625-12h17.25c.621 0 1.125.504 1.125 1.125v13.5c0 .621-.504 1.125-1.125 1.125H3.375a1.125 1.125 0 0 1-1.125-1.125V3.75c0-.621.504-1.125 1.125-1.125Z" />
+                        </svg>
+                        <p class="text-xs text-slate-500">You do not have any virtual debit cards yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Loans System -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Advanced Loans Panel</h3>
+                        <p class="text-slate-400 text-xs">Apply for loans and check disbursement statuses.</p>
+                    </div>
+                    <a href="{% url 'transactions:loan_apply' %}" class="bg-slate-800 border border-slate-750 hover:bg-slate-750 text-teal-400 text-xs px-3 py-2 rounded-xl transition font-semibold">
+                        Request Loan
+                    </a>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left">
+                        <thead class="text-[10px] uppercase text-slate-500 border-b border-slate-850">
+                            <tr>
+                                <th class="py-2.5">Amount</th>
+                                <th class="py-2.5">Rate</th>
+                                <th class="py-2.5">Duration</th>
+                                <th class="py-2.5 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-850 text-slate-300">
+                            {% if loans %}
+                                {% for loan in loans %}
+                                    <tr>
+                                        <td class="py-3 font-mono font-bold text-white">${{ loan.amount }}</td>
+                                        <td class="py-3 font-mono text-teal-400">{{ loan.interest_rate }}%</td>
+                                        <td class="py-3">{{ loan.term_months }} Months</td>
+                                        <td class="py-3 text-right">
+                                            {% if loan.status == 'PENDING' %}
+                                                <span class="px-2.5 py-0.5 rounded bg-yellow-950/30 text-yellow-500 border border-yellow-500/10 font-bold uppercase tracking-wider text-[9px]">Pending</span>
+                                            {% elif loan.status == 'APPROVED' %}
+                                                <span class="px-2.5 py-0.5 rounded bg-teal-950/30 text-teal-400 border border-teal-500/10 font-bold uppercase tracking-wider text-[9px]">Approved</span>
+                                            {% else %}
+                                                <span class="px-2.5 py-0.5 rounded bg-red-950/30 text-red-400 border border-red-500/10 font-bold uppercase tracking-wider text-[9px]">Rejected</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-6 text-slate-500">No loans registered.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="text-[10px] text-slate-500 pt-3 border-t border-slate-850 mt-4">
+                Approved loans are instantly disbursed to your balance with a custom credit calculation.
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold text-white">Recent Statements</h3>
+                <p class="text-slate-400 text-xs">Verify your ledger activity and bank status.</p>
+            </div>
+            <a href="{% url 'transactions:transaction_report' %}" class="text-xs text-teal-400 hover:underline">View Full Statement</a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+                <thead class="text-[10px] uppercase text-slate-500 border-b border-slate-850">
+                    <tr>
+                        <th class="py-3">Transaction</th>
+                        <th class="py-3">Recipient/Sender</th>
+                        <th class="py-3">Timestamp</th>
+                        <th class="py-3">Amount</th>
+                        <th class="py-3 text-right">Running Balance</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-850 text-slate-300">
+                    {% if transactions %}
+                        {% for tx in transactions %}
+                            <tr class="hover:bg-slate-850/40 transition">
+                                <td class="py-3 font-semibold text-white">
+                                    {% if tx.transaction_type == 1 %}
+                                        <span class="text-teal-400">Deposit</span>
+                                    {% elif tx.transaction_type == 2 %}
+                                        <span class="text-red-400">Withdrawal</span>
+                                    {% elif tx.transaction_type == 3 %}
+                                        <span class="text-indigo-400">Interest Added</span>
+                                    {% elif tx.transaction_type == 4 %}
+                                        <span class="text-red-400">Transfer Out</span>
+                                    {% elif tx.transaction_type == 5 %}
+                                        <span class="text-teal-400">Transfer In</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 font-mono text-slate-400">
+                                    {% if tx.receiver %}
+                                        Acct: {{ tx.receiver.account_no }}
+                                    {% else %}
+                                        Counter
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-slate-450">{{ tx.timestamp|date:"Y-m-d H:i" }}</td>
+                                <td class="py-3 font-mono font-bold {% if tx.transaction_type == 1 or tx.transaction_type == 3 or tx.transaction_type == 5 %}text-teal-400{% else %}text-red-400{% endif %}">
+                                    {% if tx.transaction_type == 1 or tx.transaction_type == 3 or tx.transaction_type == 5 %}+{% else %}-{% endif %} ${{ tx.amount }}
+                                </td>
+                                <td class="py-3 text-right font-mono text-slate-400">${{ tx.balance_after_transaction }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-6 text-slate-500">No transactions recorded yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Savings Goal Edit Modal -->
+<div id="goal-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm px-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+        <button onclick="document.getElementById('goal-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h3 class="text-lg font-bold text-white mb-4">Set Savings Goal</h3>
+        <form method="post" action="{% url 'accounts:user_dashboard' %}" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-slate-450 text-xs font-semibold uppercase tracking-wider mb-2">Goal Title</label>
+                {{ saving_goal_form.saving_goal_title }}
+            </div>
+            <div>
+                <label class="block text-slate-450 text-xs font-semibold uppercase tracking-wider mb-2">Target Budget Amount ($)</label>
+                {{ saving_goal_form.saving_goal }}
+            </div>
+            <div class="pt-2">
+                <button type="submit" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-3 rounded-xl transition text-sm">
+                    Save Budget Goal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Chart Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('spendingChart').getContext('2d');
+        
+        const totalWithdrawn = parseFloat("{{ total_withdrawn|default:0 }}");
+        const totalTransferred = parseFloat("{{ total_transferred|default:0 }}");
+        const currentBalance = parseFloat("{{ account.balance|default:0 }}");
+
+        // Fallback display if all values are 0
+        const dataValues = [
+            currentBalance,
+            totalWithdrawn,
+            totalTransferred
+        ];
+        
+        const hasData = currentBalance > 0 || totalWithdrawn > 0 || totalTransferred > 0;
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Current Balance', 'Withdrawals', 'Transfers Out'],
+                datasets: [{
+                    data: hasData ? dataValues : [100, 0, 0],
+                    backgroundColor: [
+                        '#2dd4bf', // Teal 400
+                        '#f87171', // Red 400
+                        '#818cf8'  // Indigo 400
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#0f172a',
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            color: '#94a3b8',
+                            font: {
+                                size: 10,
+                                family: 'Plus Jakarta Sans'
+                            },
+                            boxWidth: 10
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+
+{% block head_title %}OTC Counter Action | Aditya Banking{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto mt-10">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+        <div class="text-center space-y-1">
+            <h2 class="text-2xl font-extrabold text-white">OTC Counter Transaction</h2>
+            <p class="text-slate-400 text-sm">Perform instant deposit or withdrawal operations directly to/from a customer's ledger balance.</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="bg-red-950/40 border border-red-500/20 rounded-xl p-4 text-xs text-red-200">
+                {% for error in form.non_field_errors %}
+                    <p class="font-semibold">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Customer Account Number</label>
+                {{ form.customer_account_no }}
+                {% if form.customer_account_no.errors %}
+                    {% for error in form.customer_account_no.errors %}
+                        <p class="text-red-400 text-[11px] font-semibold mt-1">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Transaction Type</label>
+                {{ form.transaction_type }}
+                {% if form.transaction_type.errors %}
+                    {% for error in form.transaction_type.errors %}
+                        <p class="text-red-400 text-[11px] font-semibold mt-1">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Amount ($)</label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                    {% for error in form.amount.errors %}
+                        <p class="text-red-400 text-[11px] font-semibold mt-1">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="pt-4 flex items-center justify-between space-x-3">
+                <a href="{% url 'accounts:employee_dashboard' %}" class="w-1/2 text-center bg-slate-800 hover:bg-slate-750 text-slate-300 font-bold py-3 rounded-xl transition text-sm">
+                    Back to Portal
+                </a>
+                <button type="submit" class="w-1/2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-teal-500/10">
+                    Process Transaction
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

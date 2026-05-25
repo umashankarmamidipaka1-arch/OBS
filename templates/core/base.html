@@ -1,30 +1,70 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="Dummy Banking System" />
-        <meta name="author" content="Maksudul Haque" />
+        <meta name="description" content="Aditya Banking - Futuristic Banking Portal" />
+        <meta name="author" content="Aditya Banking" />
         <title>
-            {% block head_title %}Banking System{% endblock %}
+            {% block head_title %}Aditya Banking{% endblock %}
         </title>
-        <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-
+        
+        <!-- Google Fonts: Plus Jakarta Sans -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        
+        <!-- Tailwind CSS v3 Play CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        },
+                    }
+                }
+            }
+        </script>
+        
+        <style>
+            /* Custom glassmorphism scrollbars and transitions */
+            body {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+            }
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #090d16;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #1e293b;
+                border-radius: 3px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #2dd4bf;
+            }
+        </style>
         {% block head_extra %}{% endblock %}
     </head>
-    <body class="bg-gray-100">
+    <body class="flex flex-col min-h-full bg-slate-950 text-slate-100 antialiased">
         {% block body %}
             {% include 'core/navbar.html' %}
-            <div class="lg:container lg:mx-auto">
+            
+            <main class="flex-grow container mx-auto px-4 md:px-6 py-8 max-w-7xl">
                 {% include 'core/messages.html' %}
                 {% block content %}
                 <!-- Add content here -->
                 {% endblock %}
-            </div>
+            </main>
+            
             {% include 'core/footer.html' %}
-
         {% endblock %}
+        
         {% block footer_extra %}{% endblock %}
     </body>
 </html>

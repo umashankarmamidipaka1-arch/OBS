@@ -1,45 +1,56 @@
 {% extends 'core/base.html' %}
 
-{% block head_title %}Banking System{% endblock %}
+{% block head_title %}Login | Aditya Banking{% endblock %}
 
 {% block content %}
-{% if form.non_field_errors %}
-    {% for error in form.non_field_errors %}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2" role="alert">
-            <p class="font-bold">Error!</p>
-            <p class="block sm:inline">{{ error }}</p>
+<div class="max-w-md mx-auto mt-12">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+        <div class="text-center space-y-1">
+            <div class="inline-flex space-x-1.5 justify-center items-center mb-2">
+                <span class="font-extrabold text-2xl tracking-wider text-teal-400">ADITYA</span>
+                <span class="font-light text-2xl tracking-widest text-slate-350">BANKING</span>
+            </div>
+            <h2 class="text-xl font-bold text-white">Sign In to Your Account</h2>
+            <p class="text-slate-400 text-xs">Enter your banking credentials to access your dashboard.</p>
         </div>
-    {% endfor %}
-{% endif %}
-<h1 class="font-mono font-bold text-3xl text-center pb-5 pt-10">Sign In</h1>
-<hr>
-<div class="w-full mt-10">
-    <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        {% csrf_token %}
-        {% for hidden_field in form.hidden_fields %}
-            {{ hidden_field.errors }}
-            {{ hidden_field }}
-        {% endfor %}
-        {% for field in form.visible_fields %}
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ field.id_for_label }}">
-                {{ field.label }}
-            </label>
-            <input class="shadow appearance-none border border-gray-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="{{ field.name }}" id="{{ field.id_for_label }}" type="{{ field.widget_type }}">
-        </div>
-            {% if field.errors %}
-                {% for error in field.errors %}
-                <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
 
-        <div class="flex items-center justify-between">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                Sign In
-            </button>
-        </div>
-    </form>
+        {% if form.non_field_errors %}
+            <div class="bg-red-950/40 border border-red-500/20 rounded-xl p-4 text-xs text-red-200 space-y-1">
+                {% for error in form.non_field_errors %}
+                    <p class="font-semibold">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field }}
+            {% endfor %}
+            
+            {% for field in form.visible_fields %}
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400" for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                    <input class="w-full bg-slate-950 border border-slate-850 focus:border-teal-500 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none transition" name="{{ field.name }}" id="{{ field.id_for_label }}" type="{% if 'password' in field.name %}password{% else %}text{% endif %}" required>
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p class="text-red-400 text-[11px] font-semibold mt-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="pt-4 flex flex-col space-y-3">
+                <button type="submit" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-teal-500/10">
+                    Access Dashboard
+                </button>
+                <div class="text-center text-xs text-slate-400 pt-2">
+                    Don't have an account? <a href="{% url 'accounts:user_registration' %}" class="text-teal-400 hover:underline">Register here</a>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
-

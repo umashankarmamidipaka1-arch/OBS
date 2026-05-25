@@ -12,8 +12,19 @@ from .managers import UserManager
 
 
 class User(AbstractUser):
+    class Role(models.TextChoices):
+        ADMIN = 'ADMIN', 'Admin'
+        BRANCH_MANAGER = 'BRANCH_MANAGER', 'Branch Manager'
+        EMPLOYEE = 'EMPLOYEE', 'Employee'
+        USER = 'USER', 'Customer'
+
     username = None
     email = models.EmailField(unique=True, null=False, blank=False)
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        default=Role.USER
+    )
 
     objects = UserManager()
 
@@ -67,6 +78,12 @@ class BankAccountType(models.Model):
 
 
 class UserBankAccount(models.Model):
+    class Status(models.TextChoices):
+        ACTIVE = 'ACTIVE', 'Active'
+        SUSPENDED = 'SUSPENDED', 'Suspended'
+        PENDING = 'PENDING', 'Pending Approval'
+        REJECTED = 'REJECTED', 'Rejected'
+
     user = models.OneToOneField(
         User,
         related_name='account',
@@ -92,6 +109,41 @@ class UserBankAccount(models.Model):
         )
     )
     initial_deposit_date = models.DateField(null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.ACTIVE
+    )
+    kyc_verified = models.BooleanField(default=False)
+    saving_goal = models.DecimalField(
+        default=0,
+        max_digits=12,
+        decimal_places=2
+    )
+    saving_goal_title = models.CharField(
+        max_length=128,
+        default="",
+        blank=True
+    )
+    
+    # RBI KYC details
+    id_proof_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('AADHAAR', 'Aadhaar Card'),
+            ('PASSPORT', 'Passport'),
+            ('DRIVING_LICENCE', 'Driving Licence'),
+            ('VOTER_ID', 'Voter ID Card'),
+            ('NREGA_JOB_CARD', 'NREGA Job Card'),
+        ],
+        null=True,
+        blank=True
+    )
+    id_proof_no = models.CharField(max_length=100, null=True, blank=True)
+    pan_no = models.CharField(max_length=20, null=True, blank=True)
+    id_proof_document = models.FileField(upload_to='id_proofs/', null=True, blank=True)
+    passport_photo = models.FileField(upload_to='passport_photos/', null=True, blank=True)
+    rejection_reason = models.TextField(default='', blank=True)
 
     def __str__(self):
         return str(self.account_no)
@@ -122,3 +174,25 @@ class UserAddress(models.Model):
 
     def __str__(self):
         return self.user.email
+
+
+class VirtualCard(models.Model):
+    account = models.ForeignKey(
+        UserBankAccount,
+        related_name='virtual_cards',
+        on_delete=models.CASCADE
+    )
+    card_number = models.CharField(max_length=16, unique=True)
+    cvv = models.CharField(max_length=3)
+    expiry_date = models.DateField()
+    limit = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=1000.00
+    )
+    is_frozen = models.BooleanField(default=False)
+    card_holder = models.CharField(max_length=256)
+
+    def __str__(self):
+        return f"{self.card_holder} - **** **** **** {self.card_number[-4:]}"
+

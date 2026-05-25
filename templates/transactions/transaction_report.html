@@ -1,56 +1,150 @@
 {% extends 'core/base.html' %}
 
-{% block head_title %}Transaction Report{% endblock %}
+{% block head_title %}Account Statement | Aditya Banking{% endblock %}
 
 {% block head_extra %}
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <style>
+        /* Custom Daterangepicker dark mode styles override */
+        .daterangepicker {
+            background-color: #0f172a !important;
+            border: 1px solid #1e293b !important;
+            color: #f1f5f9 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+        .daterangepicker td.off, .daterangepicker td.off.in-range, .daterangepicker td.off.start-date, .daterangepicker td.off.end-date {
+            background-color: #090d16 !important;
+            color: #475569 !important;
+        }
+        .daterangepicker td.available:hover, .daterangepicker th.available:hover {
+            background-color: #1e293b !important;
+        }
+        .daterangepicker td.in-range {
+            background-color: #115e59/40 !important;
+            color: #2dd4bf !important;
+        }
+        .daterangepicker td.active, .daterangepicker td.active:hover {
+            background-color: #14b8a6 !important;
+            color: #0f172a !important;
+        }
+        .daterangepicker .calendar-table {
+            background-color: #0f172a !important;
+            border: none !important;
+        }
+        .daterangepicker .drp-buttons {
+            border-top: 1px solid #1e293b !important;
+        }
+        .daterangepicker .btn {
+            font-size: 11px !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+            padding: 6px 12px !important;
+            border-radius: 6px !important;
+        }
+        .daterangepicker .cancelBtn {
+            background-color: #1e293b !important;
+            color: #cbd5e1 !important;
+            border: none !important;
+        }
+        .daterangepicker .applyBtn {
+            background-color: #14b8a6 !important;
+            color: #0f172a !important;
+            border: none !important;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-    <h1 class="font-mono font-bold text-3xl text-center pb-5 pt-10">Transaction Report</h1>
-    <hr />
-    <form method="get">
-        <div class="mt-10 h-10 pl-3 pr-2 bg-white border rounded-md border-gray-500 flex justify-between items-center relative">
-            <input type="search" name="daterange" id="search" placeholder="Filter using date range" value="{{ request.GET.daterange }}" class="appearance-none w-full outline-none focus:outline-none active:outline-none" />
-            <button type="submit" class="ml-1 outline-none focus:outline-none active:outline-none">
-                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-6 h-6">
-                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </button>
+<div class="space-y-8 mt-4">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">Account Ledger Statement</h1>
+            <p class="text-slate-400 text-sm mt-1">Review ledger transactions, interest additions, and peer-to-peer transfers.</p>
         </div>
-        {% if form.daterange.errors %}
-            {% for error in form.daterange.errors %}
-                <p class="text-red-600 text-sm italic">{{ error }}</p>
-            {% endfor %}
-        {% endif %}
-    </form>
-    <table class="table-auto mx-auto w-full mt-8">
-        <thead class="bg-gray-800 text-white">
-        <tr class="uppercase font-semibold text-sm">
-            <th class="px-4 py-2">Transaction Type</th>
-            <th class="px-4 py-2">Date</th>
-            <th class="px-4 py-2">Amount</th>
-            <th class="px-4 py-2">Balance After Transaction</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for transaction in object_list %}
-        <tr class="{% cycle 'bg-gray-300' 'bg-white-100' %}">
-            <td class="border px-4 py-2 text-center">{{ transaction.get_transaction_type_display }}</td>
-            <td class="border px-4 py-2 text-center">{{ transaction.timestamp }}</td>
-            <td class="border px-4 py-2 text-center">$ {{ transaction.amount }}</td>
-            <td class="border px-4 py-2 text-center">$ {{ transaction.balance_after_transaction }}</td>
-        </tr>
-        {% endfor %}
-        <tr class="bg-gray-600 text-white">
-            <th class="px-4 py-2 text-right" colspan="3">Final Balance</th>
-            <th class="px-4 py-2 text-center">$ {{ account.balance }}</th>
-        </tr>
-        </tbody>
-    </table>
+        <a href="{% url 'accounts:user_dashboard' %}" class="bg-slate-900 border border-slate-800 hover:bg-slate-850 text-slate-100 font-bold px-4 py-2.5 rounded-xl transition text-sm flex items-center space-x-1.5">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+            <span>Back to Dashboard</span>
+        </a>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl max-w-xl">
+        <h3 class="text-sm font-bold text-white mb-3">Filter Transactions by Date</h3>
+        <form method="get" class="space-y-3">
+            <div class="flex space-x-2">
+                <div class="flex-grow relative bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex items-center px-3.5">
+                    <input type="text" name="daterange" id="search" placeholder="Click to select a date range..." value="{{ request.GET.daterange }}" class="w-full bg-transparent outline-none py-2.5 text-sm text-slate-200 placeholder-slate-500 cursor-pointer" readonly>
+                </div>
+                <button type="submit" class="bg-teal-500 hover:bg-teal-400 text-slate-950 px-5 rounded-xl transition text-sm font-bold shadow-lg shadow-teal-500/10">
+                    Filter
+                </button>
+            </div>
+            {% if form.daterange.errors %}
+                {% for error in form.daterange.errors %}
+                    <p class="text-red-400 text-xs font-semibold">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Table statement -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+                <thead class="text-[10px] uppercase text-slate-500 border-b border-slate-850">
+                    <tr>
+                        <th class="py-3 px-4">Transaction Type</th>
+                        <th class="py-3 px-4">Timestamp</th>
+                        <th class="py-3 px-4">Amount</th>
+                        <th class="py-3 px-4 text-right">Running Balance</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-850 text-slate-300">
+                    {% if object_list %}
+                        {% for transaction in object_list %}
+                            <tr class="hover:bg-slate-850/40 transition">
+                                <td class="py-3.5 px-4 font-semibold text-white">
+                                    {% if transaction.transaction_type == 1 %}
+                                        <span class="text-teal-400">Deposit</span>
+                                    {% elif transaction.transaction_type == 2 %}
+                                        <span class="text-red-400">Withdrawal</span>
+                                    {% elif transaction.transaction_type == 3 %}
+                                        <span class="text-indigo-400">Interest Added</span>
+                                    {% elif transaction.transaction_type == 4 %}
+                                        <span class="text-red-400">Transfer Out</span>
+                                    {% elif transaction.transaction_type == 5 %}
+                                        <span class="text-teal-400">Transfer In</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3.5 px-4 text-slate-400">{{ transaction.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                <td class="py-3.5 px-4 font-mono font-bold {% if transaction.transaction_type == 1 or transaction.transaction_type == 3 or transaction.transaction_type == 5 %}text-teal-400{% else %}text-red-400{% endif %}">
+                                    {% if transaction.transaction_type == 1 or transaction.transaction_type == 3 or transaction.transaction_type == 5 %}+{% else %}-{% endif %} ${{ transaction.amount }}
+                                </td>
+                                <td class="py-3.5 px-4 text-right font-mono text-slate-300">${{ transaction.balance_after_transaction }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-6 text-slate-500">No transactions recorded in this period.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                <tfoot>
+                    <tr class="bg-slate-950/60 font-semibold border-t border-slate-800 text-slate-200">
+                        <td colspan="3" class="py-4 px-4 text-right text-xs uppercase tracking-wider text-slate-400">Current Ledger Balance</td>
+                        <td class="py-4 px-4 text-right font-mono text-base text-teal-400">${{ account.balance }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block footer_extra %}

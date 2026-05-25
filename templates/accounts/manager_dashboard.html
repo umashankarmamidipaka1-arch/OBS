@@ -1,0 +1,216 @@
+{% extends 'core/base.html' %}
+
+{% block head_title %}Manager Panel | Aditya Banking{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-white">Branch Management Panel</h1>
+        <p class="text-slate-400 text-sm mt-1">Audit bank metrics, authorize credit disbursement requests, and enforce compliance guidelines.</p>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-2">
+            <span class="text-xs uppercase tracking-widest text-slate-500 font-semibold">Total Custody Assets</span>
+            <h3 class="text-3xl font-extrabold text-white font-mono">$ {{ total_bank_balance|default:"0.00" }}</h3>
+            <p class="text-slate-500 text-[10px]">Aggregated cash reserves across all bank account profiles.</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-2">
+            <span class="text-xs uppercase tracking-widest text-slate-500 font-semibold">Authorized Loans</span>
+            <h3 class="text-3xl font-extrabold text-teal-400 font-mono">{{ total_loans_approved }}</h3>
+            <p class="text-slate-500 text-[10px]">Approved credit loans currently active on user ledgers.</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-2">
+            <span class="text-xs uppercase tracking-widest text-slate-500 font-semibold">Active Customers</span>
+            <h3 class="text-3xl font-extrabold text-indigo-400 font-mono">{{ all_accounts_count }}</h3>
+            <p class="text-slate-500 text-[10px]">Registered and fully functional customer profiles.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Loan Approvals Panel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-white">Credit Authorization Queue</h3>
+            <p class="text-slate-400 text-xs">Review pending credit requests. Approving a request instantly deposits the principal into the user's ledger.</p>
+            
+            <div class="space-y-4 pt-2">
+                {% if pending_loans %}
+                    {% for loan in pending_loans %}
+                        <div class="bg-slate-950 border border-slate-850 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0">
+                            <div>
+                                <div class="font-bold text-sm text-white">Amount: <span class="font-mono text-teal-400">${{ loan.amount }}</span></div>
+                                <div class="text-xs text-slate-400 mt-0.5">Term: <strong class="text-slate-200">{{ loan.term_months }} Months</strong> | Rate: <strong class="text-slate-200">{{ loan.interest_rate }}%</strong></div>
+                                <div class="text-[10px] text-slate-500 mt-1">Holder: {{ loan.account.user.get_full_name|default:loan.account.user.email }} (Acct: {{ loan.account.account_no }})</div>
+                            </div>
+                            <div class="flex space-x-2 w-full md:w-auto">
+                                <form method="post" action="{% url 'transactions:approve_loan' loan.id 'approve' %}" class="w-1/2 md:w-auto">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-bold px-3 py-2 rounded-lg transition">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'transactions:approve_loan' loan.id 'reject' %}" class="w-1/2 md:w-auto">
+                                    {% csrf_token %}
+                                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-750 text-red-400 border border-slate-750 px-3 py-2 rounded-lg transition text-xs font-bold">
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="flex flex-col items-center justify-center py-8 text-center">
+                        <svg class="h-10 w-10 text-slate-800 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        <p class="text-xs text-slate-500">No pending credit loan applications.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Account Controls & Compliance -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="text-lg font-bold text-white">Compliance & Fraud Overrides</h3>
+            <p class="text-slate-400 text-xs">Temporarily suspend or activate user account access in response to security notifications.</p>
+            
+            <div class="overflow-x-auto pt-2">
+                <table class="w-full text-xs text-left">
+                    <thead class="text-[10px] uppercase text-slate-500 border-b border-slate-850">
+                        <tr>
+                            <th class="py-2.5">Account</th>
+                            <th class="py-2.5">Status</th>
+                            <th class="py-2.5 text-right">Compliance Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-850 text-slate-300">
+                        {% if pending_accounts or all_accounts %}
+                            {% for acc in pending_accounts|default:all_accounts %}
+                                <!-- Render a subset of accounts for quick control -->
+                                <tr class="hover:bg-slate-850/30 transition">
+                                    <td class="py-3">
+                                        <div class="font-bold text-white font-mono">{{ acc.account_no }}</div>
+                                        <div class="text-[10px] text-slate-500">{{ acc.user.email }}</div>
+                                    </td>
+                                    <td class="py-3 font-semibold">
+                                        {% if acc.status == 'ACTIVE' %}
+                                            <span class="text-teal-400">Active</span>
+                                        {% elif acc.status == 'SUSPENDED' %}
+                                            <span class="text-red-400">Suspended</span>
+                                        {% else %}
+                                            <span class="text-yellow-500">Pending Approval</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <div class="inline-flex space-x-1.5">
+                                            {% if acc.status == 'ACTIVE' %}
+                                                <form method="post" action="{% url 'transactions:approve_account' acc.id 'suspend' %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="bg-red-950/20 hover:bg-red-950/40 text-red-400 border border-red-500/10 text-[10px] px-2.5 py-1 rounded transition font-bold uppercase tracking-wider">
+                                                        Suspend
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <form method="post" action="{% url 'transactions:approve_account' acc.id 'approve' %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 border border-teal-500/10 text-[10px] px-2.5 py-1 rounded transition font-bold uppercase tracking-wider">
+                                                        Activate
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-6 text-slate-500">No customer profiles detected.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Account Registrations Panel (RBI KYC Review) -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+            <svg class="h-5 w-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 0A48.536 48.536 0 0 1 12 3m0 0c2.917 0 5.747.294 8.5.862m-21 1.402v11.496c0 1.242 1.008 2.25 2.25 2.25h13.75" />
+            </svg>
+            <span>Pending Account Registrations (RBI KYC Review)</span>
+        </h3>
+        <p class="text-slate-400 text-xs">Verify customer identity profiles and credentials. Approved registrations create active accounts. Rejected applicants will be forced to re-apply.</p>
+        
+        <div class="space-y-4 pt-2">
+            {% if pending_accounts %}
+                {% for acc in pending_accounts %}
+                    <div class="bg-slate-950 border border-slate-850 rounded-xl p-5 flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
+                        <div class="flex items-start space-x-4">
+                            <!-- Passport Photo -->
+                            <div class="h-20 w-20 rounded-lg overflow-hidden border border-slate-800 bg-slate-900 flex-shrink-0 flex items-center justify-center">
+                                {% if acc.passport_photo %}
+                                    <img src="{{ acc.passport_photo.url }}" class="h-full w-full object-cover" alt="Photo">
+                                {% else %}
+                                    <span class="text-[9px] text-slate-650">No Photo</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Information Details -->
+                            <div class="text-xs space-y-1">
+                                <h4 class="font-bold text-white text-sm">{{ acc.user.get_full_name }}</h4>
+                                <p class="text-slate-400">Email: <strong class="text-slate-200">{{ acc.user.email }}</strong> | Account Type: <strong class="text-slate-200">{{ acc.account_type.name }}</strong></p>
+                                <p class="text-slate-400">ID Type: <strong class="text-slate-200">{{ acc.get_id_proof_type_display }}</strong> | ID: <strong class="text-slate-200 font-mono">{{ acc.id_proof_no }}</strong> | PAN: <strong class="text-slate-200 font-mono">{{ acc.pan_no }}</strong></p>
+                                <p class="text-slate-500">Address: {{ acc.user.address.street_address }}, {{ acc.user.address.city }}, {{ acc.user.address.postal_code }}, {{ acc.user.address.country }}</p>
+                                
+                                <div class="pt-1.5">
+                                    {% if acc.id_proof_document %}
+                                        <a href="{{ acc.id_proof_document.url }}" target="_blank" class="inline-flex items-center space-x-1 text-teal-400 hover:text-teal-300 font-semibold text-[11px]">
+                                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                            </svg>
+                                            <span>View Uploaded ID Proof ({{ acc.id_proof_document.name|slice:"11:" }})</span>
+                                        </a>
+                                    {% else %}
+                                        <span class="text-slate-600 italic">No document uploaded</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions Grid -->
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 w-full lg:w-auto">
+                            <!-- Reject Form -->
+                            <form method="post" action="{% url 'transactions:approve_account' acc.id 'reject' %}" class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1.5 flex-grow lg:flex-grow-0">
+                                {% csrf_token %}
+                                <input type="text" name="rejection_reason" placeholder="Rejection notes..." required class="bg-transparent outline-none border-none text-[11px] text-slate-200 placeholder-slate-500 px-2 py-1 w-40 sm:w-48">
+                                <button type="submit" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] font-bold px-3 py-1.5 rounded transition uppercase tracking-wider">
+                                    Reject
+                                </button>
+                            </form>
+
+                            <!-- Approve Form -->
+                            <form method="post" action="{% url 'transactions:approve_account' acc.id 'approve' %}" class="flex items-stretch flex-grow lg:flex-grow-0">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-bold px-5 py-3 rounded-lg transition shadow-lg shadow-teal-500/15">
+                                    Approve & Open Ledger
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="flex flex-col items-center justify-center py-10 text-center">
+                    <svg class="h-10 w-10 text-slate-800 mb-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                    </svg>
+                    <p class="text-xs text-slate-500">All identity and account request queues are clear.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

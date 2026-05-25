@@ -1,24 +1,136 @@
 {% extends 'core/base.html' %}
 
-{% block head_title %}Banking System{% endblock %}
+{% block head_title %}Aditya Banking | Futuristic Banking Portal{% endblock %}
 
 {% block content %}
-    <div class="container mx-auto flex flex-col md:flex-row items-center my-12 md:my-24">
-        <!--Left Col-->
-        <div class="flex flex-col w-full lg:w-1/2 justify-center items-start pt-12 pb-24 px-6">
-            <h1 class="font-bold text-4xl my-4">Banking System</h1>
-            <p class="leading-normal mb-4">
-                This is an Example web application created using django.
-                You can find the sourse code on <a href="https://github.com/umashankarmamidipaka1-arch/OBS">GitHub</a>
+<div class="space-y-24 py-12">
+    <!-- Hero Section -->
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+        <!-- Left Side: Copy -->
+        <div class="flex flex-col space-y-6 max-w-2xl">
+            <span class="text-xs uppercase tracking-widest bg-teal-400/10 border border-teal-500/20 text-teal-400 px-3.5 py-1.5 rounded-full font-bold w-fit">
+                Quantum-Secure Banking
+            </span>
+            <h1 class="text-5xl md:text-6xl font-black text-white leading-tight">
+                Futuristic Banking, <span class="bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">Reimagined.</span>
+            </h1>
+            <p class="text-slate-400 text-lg leading-relaxed">
+                Experience Aditya Banking: a role-separated digital ecosystem built on top-tier Django models. Control virtual debit cards, request credit instantly, perform P2P transfers, and view audit statement ledgers.
             </p>
-            <div>
-            <a href="{% url 'accounts:user_registration' %}" class="bg-transparent hover:bg-gray-800 text-gray-800 hover:text-white rounded shadow hover:shadow-lg py-2 px-4 border border-gray-900 hover:border-transparent">Register</a>
-            <a href="https://github.com/umashankarmamidipaka1-arch/OBS" class="bg-transparent hover:bg-gray-800 text-gray-800 hover:text-white rounded shadow hover:shadow-lg py-2 px-4 border border-gray-900 hover:border-transparent">GitHub</a>
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a href="{% url 'accounts:user_registration' %}" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold px-8 py-4 rounded-2xl transition shadow-lg shadow-teal-500/20 text-base">
+                    Get Started Instantly
+                </a>
+                <a href="{% url 'accounts:user_login' %}" class="bg-slate-900 border border-slate-800 hover:bg-slate-850 text-slate-200 font-bold px-8 py-4 rounded-2xl transition text-base">
+                    Sign In
+                </a>
             </div>
         </div>
-        <!--Right Col-->
-        <div class="w-full lg:w-1/2 lg:py-6 text-center">
-            <h1 style="font-size: 12rem" class="font-black text-gray-800">$$$</h1>
+        
+        <!-- Right Side: Glowing Symbol -->
+        <div class="w-full lg:w-1/2 flex items-center justify-center relative">
+            <div class="absolute w-72 h-72 rounded-full bg-teal-500/10 blur-3xl animate-pulse"></div>
+            <div class="absolute w-72 h-72 rounded-full bg-indigo-500/10 blur-3xl translate-x-12 translate-y-12"></div>
+            <div class="relative bg-slate-900/60 border border-slate-800 backdrop-blur-md rounded-3xl p-8 shadow-2xl w-80 h-80 flex flex-col justify-between overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <span class="font-extrabold text-xl tracking-wider text-teal-400">ADITYA CARD</span>
+                    <span class="text-slate-500 text-xs">VIRTUAL</span>
+                </div>
+                <div>
+                    <p class="font-mono text-xl text-white tracking-widest">4893 **** **** 9012</p>
+                    <div class="flex justify-between mt-4 text-[10px] text-slate-450 uppercase">
+                        <div>
+                            <span>Holder</span>
+                            <span class="block font-semibold text-white mt-0.5">Valued Partner</span>
+                        </div>
+                        <div>
+                            <span>Expires</span>
+                            <span class="block font-semibold text-white mt-0.5">05/30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Feature Grid -->
+    <div class="space-y-12">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+            <h2 class="text-3xl font-extrabold text-white">Full-Suite Banking Ecosystem</h2>
+            <p class="text-slate-400 text-sm">Every feature is connected with fine-grained permissions and built-in role verification.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Feature 1 -->
+            <div class="bg-slate-900/50 border border-slate-900 rounded-2xl p-6 hover:border-slate-800 transition duration-300 space-y-4">
+                <div class="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white">Peer-to-Peer Transfers</h3>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    Instantly route funds to any customer by account number. Transfers register instant matching ledger logs for both source and destination accounts.
+                </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="bg-slate-900/50 border border-slate-900 rounded-2xl p-6 hover:border-slate-800 transition duration-300 space-y-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-5.625-12h17.25c.621 0 1.125.504 1.125 1.125v13.5c0 .621-.504 1.125-1.125 1.125H3.375a1.125 1.125 0 0 1-1.125-1.125V3.75c0-.621.504-1.125 1.125-1.125Z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white">Virtual Cards Vault</h3>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    Generate secure virtual cards. Set transaction limits, freeze cards in real-time, or terminate them instantly to protect your real balance.
+                </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="bg-slate-900/50 border border-slate-900 rounded-2xl p-6 hover:border-slate-800 transition duration-300 space-y-4">
+                <div class="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.879M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM12 6.502v.01M12 9.002v.01" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white">Advanced Loans Panel</h3>
+                <p class="text-slate-400 text-xs leading-relaxed">
+                    Request loans directly with dynamically calculated interest premiums. Loan disbursements require Branch Manager authorization.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Section -->
+    <div class="bg-slate-900/30 border border-slate-900 rounded-3xl p-8 md:p-12 space-y-8">
+        <div class="max-w-2xl space-y-3">
+            <h2 class="text-3xl font-extrabold text-white">Role-Based Permission Matrix</h2>
+            <p class="text-slate-400 text-sm">We separate operations into 4 distinct user tiers to maintain strict accountability.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-teal-400">01 / Customer</span>
+                <h4 class="text-base font-bold text-white">Standard Banking</h4>
+                <p class="text-slate-400 text-xs leading-relaxed">Manage funds, savings goals, virtual debit cards, and request credit loans.</p>
+            </div>
+            <div class="space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">02 / Employee</span>
+                <h4 class="text-base font-bold text-white">Teller Counter</h4>
+                <p class="text-slate-400 text-xs leading-relaxed">Perform Over-The-Counter customer deposit/withdrawal entries, and verify KYC files.</p>
+            </div>
+            <div class="space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-teal-400">03 / Branch Manager</span>
+                <h4 class="text-base font-bold text-white">System Authorization</h4>
+                <p class="text-slate-400 text-xs leading-relaxed">Authorize credit loans, activate suspended accounts, and overview branch-wide metrics.</p>
+            </div>
+            <div class="space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">04 / Admin</span>
+                <h4 class="text-base font-bold text-white">Global Command</h4>
+                <p class="text-slate-400 text-xs leading-relaxed">System security administration, global audit logs review, and user role updates console.</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

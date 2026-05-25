@@ -1,36 +1,104 @@
-<nav class="flex items-center justify-between flex-wrap bg-gray-800 p-6">
-    <div class="flex items-center flex-shrink-0 text-white mr-6">
-        <span class="font-semibold text-xl tracking-tight">Banking System</span>
+<nav class="flex items-center justify-between flex-wrap bg-gray-950 px-8 py-5 shadow-lg border-b border-gray-800">
+    <div class="flex items-center flex-shrink-0 text-white mr-8">
+        <a href="/" class="flex items-center space-x-2">
+            <span class="font-extrabold text-2xl tracking-wider text-teal-400">ADITYA</span>
+            <span class="font-light text-2xl tracking-widest text-gray-300">BANKING</span>
+        </a>
     </div>
+    
     <div class="block lg:hidden">
-        <button class="flex items-center px-3 py-2 border rounded text-white border-white-400 hover:text-white hover:border-white">
-            <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/></svg>
+        <button id="menu-toggle" class="flex items-center px-3 py-2 border rounded text-teal-400 border-teal-500 hover:text-white hover:border-white transition">
+            <svg class="fill-current h-4 w-4" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <title>Menu</title>
+                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/>
+            </svg>
         </button>
     </div>
-    <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
-        {% if request.user.is_authenticated %}
-            <div class="text-md lg:flex-grow">
-                <a href="{% url 'transactions:transaction_report' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4">
-                    Transaction Report
+    
+    <div id="menu-items" class="w-full hidden lg:flex lg:items-center lg:w-auto flex-grow justify-between">
+        <div class="text-sm lg:flex-grow space-x-1 lg:space-x-4">
+            {% if request.user.is_authenticated %}
+                {% if request.user.role == 'USER' %}
+                    <a href="{% url 'accounts:user_dashboard' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Dashboard
+                    </a>
+                    <a href="{% url 'transactions:deposit_money' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Deposit
+                    </a>
+                    <a href="{% url 'transactions:withdraw_money' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Withdraw
+                    </a>
+                    <a href="{% url 'transactions:transfer_money' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        P2P Transfer
+                    </a>
+                    <a href="{% url 'transactions:loan_apply' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Apply Loan
+                    </a>
+                    <a href="{% url 'transactions:transaction_report' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Statement
+                    </a>
+                {% elif request.user.role == 'EMPLOYEE' %}
+                    <a href="{% url 'accounts:employee_dashboard' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Employee Portal
+                    </a>
+                    <a href="{% url 'transactions:otc_transaction' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        OTC Transaction
+                    </a>
+                {% elif request.user.role == 'BRANCH_MANAGER' %}
+                    <a href="{% url 'accounts:manager_dashboard' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Manager Panel
+                    </a>
+                    <a href="{% url 'accounts:employee_dashboard' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Employee View
+                    </a>
+                    <a href="{% url 'transactions:otc_transaction' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        OTC Transaction
+                    </a>
+                {% elif request.user.role == 'ADMIN' %}
+                    <a href="{% url 'accounts:admin_dashboard' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Admin Console
+                    </a>
+                    <a href="{% url 'accounts:manager_dashboard' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Manager View
+                    </a>
+                    <a href="{% url 'accounts:employee_dashboard' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        Employee View
+                    </a>
+                    <a href="{% url 'transactions:otc_transaction' %}" class="block mt-4 lg:inline-block lg:mt-0 text-gray-300 hover:text-teal-400 font-semibold transition px-3 py-2 rounded-md hover:bg-gray-900">
+                        OTC Transaction
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="flex items-center space-x-4 mt-4 lg:mt-0">
+            {% if request.user.is_authenticated %}
+                <span class="text-gray-400 text-sm hidden md:inline">
+                    Logged in as: <strong class="text-teal-400 font-medium">{{ request.user.email }}</strong> 
+                    <span class="px-2 py-0.5 ml-1 text-xs bg-gray-800 text-teal-300 border border-teal-800 rounded font-bold uppercase tracking-wider">{{ request.user.get_role_display }}</span>
+                </span>
+                <a href="{% url 'accounts:user_logout' %}" class="inline-block font-semibold text-sm px-4 py-2 border rounded-lg text-teal-400 border-teal-500 hover:border-transparent hover:text-gray-950 hover:bg-teal-400 transition shadow-md">
+                    Logout
                 </a>
-                <a href="{% url 'transactions:deposit_money' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4">
-                    Deposit
+            {% else %}
+                <a href="{% url 'accounts:user_login' %}" class="inline-block font-semibold text-sm px-4 py-2 text-gray-300 hover:text-teal-400 transition">
+                    Login
                 </a>
-                <a href="{% url 'transactions:withdraw_money' %}" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white">
-                    Withdraw
+                <a href="{% url 'accounts:user_registration' %}" class="inline-block font-semibold text-sm px-4 py-2 border rounded-lg text-teal-400 border-teal-500 hover:border-transparent hover:text-gray-950 hover:bg-teal-400 transition shadow-md">
+                    Register
                 </a>
-            </div>
-            <div>
-                <a href="{% url 'accounts:user_logout' %}" class="inline-block font-medium text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0">Logout</a>
-            </div>
-        {% else %}
-            <div class="text-md lg:flex-grow"></div>
-            <div>
-                <a href="{% url 'accounts:user_login' %}" class="mr-2 inline-block font-medium text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0">Login</a>
-            </div>
-            <div>
-                <a href="{% url 'accounts:user_registration' %}" class="inline-block font-medium text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0">Register</a>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 </nav>
+
+<script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+        var menu = document.getElementById('menu-items');
+        if (menu.classList.contains('hidden')) {
+            menu.classList.remove('hidden');
+        } else {
+            menu.classList.add('hidden');
+        }
+    });
+</script>
